@@ -78,9 +78,11 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
-#    'scrapySpider01.middlewares.Scrapyspider01DownloaderMiddleware': 543,
-#}
+DOWNLOADER_MIDDLEWARES = {
+    #'scrapySpider01.middlewares.Scrapyspider01DownloaderMiddleware': 543,
+    #'scrapy.downloadermiddleware.useragent.UserAgentMiddleware': None,
+    #'scrapySpider01.middlewares.randomoUserAgentMiddleware': 400
+}
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html

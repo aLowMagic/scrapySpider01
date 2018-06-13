@@ -13,3 +13,4 @@ class Scrapyspider01Item(scrapy.Item):
     abstract = scrapy.Field()
     main_body = scrapy.Field()
     originUrl = scrapy.Field()
+    comments = scrapy.Field()

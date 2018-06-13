@@ -5,14 +5,13 @@ import requests
 import re
 import html
 from scrapySpider01.spiders.getSomething import getUrls
-from scrapySpider01.items import Scrapyspider01Item
 import json
 from scrapySpider01.items import Scrapyspider01Item
 
 class spider00(scrapy.Spider):
     name = 'td_spider'
     allowed_domains = ["www.toutiao.com"]
-    start_urls = getUrls(page=1, keyWord='头条')
+    start_urls = getUrls(page=1, keyWord='dota2')
 
 
     def parse(self, response):
@@ -22,9 +21,9 @@ class spider00(scrapy.Spider):
         for data in datas:
             if('group_id' in data.keys()):
                 mainUrl = 'https://www.toutiao.com/a'+str(data['group_id'])+'/'
-                yield self.sec_parse(mainUrl)
+                yield self.sec_parse(data['group_id'], mainUrl)
 
-    def sec_parse(self, url):
+    def sec_parse(self, group_id, url):
         fullText = requests.get(url=url).text
         item = Scrapyspider01Item()
         try:
@@ -49,8 +48,9 @@ class spider00(scrapy.Spider):
                 item['abstract'] = str(reg[0][3:-1])
 
             item['originUrl'] = str(url)
+            item['comments'] = self.getComments(group_id)
 
-            self.log("文章："+item['title']+" 爬取成功")
+            self.log("文章："+item['title']+" 访问成功")
 
             return item
 
@@ -59,3 +59,21 @@ class spider00(scrapy.Spider):
 
 
 
+    def getComments(self, group_id):
+        url = 'https://www.toutiao.com/api/comment/list/?group_id=%s&item_id=%s&offset=0&count=20' %(group_id, group_id)
+        commentsRequest = requests.get(url=url, headers={'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)'
+                                                                         ' Chrome/67.0.3396.87 Safari/537.36'})
+        text = json.loads(commentsRequest.text)
+        comments = (text['data'])
+
+        total = comments['total']
+        comments = comments['comments']
+        res = []
+        res.append({'total': str(total)})
+        if int(total) > 0:
+            for com in comments:
+                name = com['user']['name']
+                text = com['text']
+                res.append({name: text})
+        comm = json.dumps(res, ensure_ascii=False)
+        return comm
